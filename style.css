@@ -1,1 +1,31 @@
-body{background:#0b0b0b;color:#fff;font-family:Arial;margin:0;padding:20px;}
+:root{
+  --bg:#0b0b0b; --card:#111; --accent:#ffd400; --muted:#bdbdbd;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,Segoe UI,Roboto,Arial;background:linear-gradient(180deg,var(--bg),#050505);color:#fff}
+.app{max-width:900px;margin:18px auto;padding:12px}
+header{display:flex;justify-content:space-between;align-items:center}
+h1{margin:0;font-size:22px}
+.card{background:var(--card);padding:12px;border-radius:10px;margin:12px 0;border:1px solid rgba(255,255,255,0.03)}
+.hidden{display:none}
+.row{display:flex;gap:8px;align-items:center}
+input{padding:8px;border-radius:6px;border:1px solid rgba(255,255,255,0.06);background:#0f0f0f;color:#fff}
+button{padding:8px 12px;border-radius:8px;border:0;background:rgba(255,255,255,0.03);color:#fff;cursor:pointer}
+button.accent{background:var(--accent);color:#111;font-weight:700}
+button.small{padding:6px 8px;font-size:13px}
+.controls{display:flex;gap:10px;align-items:center}
+.big{padding:12px 18px;font-size:16px;border-radius:12px}
+.case-area{position:relative;height:150px;overflow:hidden}
+.reel{display:flex;align-items:center;gap:12px;padding:18px;transition:transform 2.4s cubic-bezier(.22,.95,.12,1)}
+.reel .card{min-width:180px;height:100px;background:linear-gradient(180deg,#161616,#0e0e0e);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px}
+.mask{position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;box-shadow:inset 0 40px 30px rgba(0,0,0,0.7)}
+.panels{display:flex;gap:12px}
+#inventory .inv-item,#shop .shop-item{padding:8px;border-radius:8px;margin-bottom:8px;background:rgba(255,255,255,0.02);display:flex;justify-content:space-between;align-items:center}
+.rarity-Common{border-left:6px solid #7b7b7b;padding-left:8px}
+.rarity-Uncommon{border-left:6px solid #2fb67a;padding-left:8px}
+.rarity-Rare{border-left:6px solid #3b82f6;padding-left:8px}
+.rarity-Epic{border-left:6px solid #a855f7;padding-left:8px}
+.rarity-Legend{border-left:6px solid #ff6b6b;padding-left:8px}
+.modal{position:fixed;left:0;top:0;right:0;bottom:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center}
+.modal .modal-body{background:#0e0e0e;padding:16px;border-radius:10px;width:300px}
+footer{margin-top:14px;color:var(--muted)}
