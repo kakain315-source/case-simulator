@@ -53,4 +53,63 @@ button.ghost {
   justify-content: space-between;
 }
 
-.rarity-Legend {
+.rarity-Legend { color: #ff5050; }
+.rarity-Epic { color: #8f5bff; }
+.rarity-Rare { color: #4ea3ff; }
+.rarity-Uncommon { color: #7aff7a; }
+.rarity-Common { color: #ccc; }
+
+#reel {
+  display: flex;
+  overflow: hidden;
+  width: 100%;
+  margin-top: 25px;
+}
+
+.card-inner {
+  width: 180px;
+  margin-right: 12px;
+  padding: 12px;
+  background: #222;
+  border-radius: 6px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- 🔐 Авторизация -->
+<div id="auth">
+  <h2>Вход / Регистрация</h2>
+  <input id="inUser" type="text" placeholder="Имя аккаунта"><br>
+  <input id="inPass" type="password" placeholder="Пароль"><br>
+
+  <button id="btnRegister" class="primary">Регистрация</button>
+  <button id="btnLogin" class="ghost">Войти</button>
+</div>
+
+<!-- 🎮 Игра -->
+<div id="game" class="hidden">
+
+  <h2>Аккаунт: <span id="userLabel"></span></h2>
+  <button id="btnProfile" class="ghost">Профиль</button>
+
+  <h3>Баланс: <span id="balance">0</span>₵</h3>
+
+  <h3>Открыть кейс</h3>
+  <select id="caseSelect"></select><br>
+  <button id="openCase" class="primary">Открыть</button>
+
+  <div id="reel"></div>
+
+  <h3>Инвентарь</h3>
+  <div id="inventory"></div>
+
+  <h3>Магазин кейсов</h3>
+  <div id="shop"></div>
+
+</div>
+
+<script src="main.js"></script>
+</body>
+</html>
