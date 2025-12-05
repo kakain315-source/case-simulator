@@ -52,27 +52,18 @@ function loadState() {
 
 let STORE = loadState();
 
-/* SHA-256 (HEX) */
+/* SHA-256 */
 async function sha256Hex(str) {
   const buf = await crypto.subtle.digest(
     "SHA-256",
     new TextEncoder().encode(str)
   );
-  return [...new Uint8Array(buf)]
-    .map(b => b.toString(16).padStart(2, "0"))
-    .join("");
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
 }
 
-/* ---------- ADMIN PASSWORD HASH ---------- */
-/*  
-  ЗАМЕНИ значение на SHA-256 хеш твоего пароля.
-  Пример: const ADMIN_HASH = "a34f9bc...";
-
-  Чтобы получить хеш: 
-      1) открой консоль браузера
-      2) введи: await crypto.subtle.digest("SHA-256", new TextEncoder().encode("ТВОЙ_ПАРОЛЬ"))
-*/
-const ADMIN_HASH = "javascript:alert(await crypto.subtle.digest("SHA-256", new TextEncoder().encode("Mila2010lilia")))";
+/* ---------- ADMIN PASSWORD (SHA-256) ---------- */
+/* Пароль = Mila2010lilia */
+const ADMIN_HASH = "430a4a1d88eb4e5cd0639cd1c9cdf7bea7e92298cbfceaeeef28db49f60f97de";
 
 /* ---------- UI ---------- */
 const auth = $("auth");
@@ -141,7 +132,6 @@ btnLogin.addEventListener("click", async () => {
   if (!user) return alert("Пользователь не найден");
 
   const hash = await sha256Hex(pass);
-
   if (user.passwordHash !== hash) return alert("Неверный пароль");
 
   STORE.currentUser = name;
@@ -166,9 +156,8 @@ function renderShop() {
 
   CASES.forEach(c => {
     const div = document.createElement("div");
-    div.style.margin = "6px 0";
     div.innerHTML = `
-      <div style="display:flex;justify-content:space-between;align-items:center">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin:6px 0;">
         <div>${c.name} — ${c.price}₵</div>
         <button data-id="${c.id}" class="primary">Купить</button>
       </div>
@@ -271,23 +260,25 @@ adminOk.addEventListener("click", async () => {
   const pass = adminPass.value.trim();
   const hash = await sha256Hex(pass);
 
-  if (ADMIN_HASH === "REPLACE_WITH_SHA256_HEX") {
-    return alert("Задай ADMIN_HASH в main.js!");
+  if (hash !== ADMIN_HASH) {
+    alert("Неверный пароль");
+    return;
   }
 
-  if (hash !== ADMIN_HASH) return alert("Неверный пароль");
-
-  if (!STORE.currentUser) return alert("Сначала войдите в аккаунт");
+  if (!STORE.currentUser) {
+    alert("Сначала войдите в аккаунт");
+    return;
+  }
 
   STORE.users[STORE.currentUser].coins = 999999999;
   saveState();
   refreshBalance();
 
   adminModal.classList.add("hidden");
-  alert("Админ: coins = 999999999");
+  alert("Админ режим активирован! Монеты начислены.");
 });
 
-/* ---------- Case Opening ---------- */
+/* ---------- Case opening ---------- */
 let isSpinning = false;
 
 function weightedPick(weights) {
@@ -310,7 +301,6 @@ function pickItemFromCase(c) {
 
 function openCaseByObj(c) {
   if (isSpinning) return;
-
   isSpinning = true;
   openCase.disabled = true;
 
