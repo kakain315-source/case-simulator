@@ -1,25 +1,23 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Case simulator</title>
-  <link rel="manifest" href="manifest.json" />
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Case simulator</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="app">Loading...</div>
 
-  <!-- регистрируем service worker (из корня сайта) -->
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker
-        .register('/service-worker.js')
-        .catch(() => { /* игнорируем ошибки на мобильных */ });
-    }
-  </script>
+<div id="app">Loading...</div>
 
-  <!-- подключаем основной скрипт, который находится в корне репозитория -->
-  <script src="main.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/service-worker.js').catch(()=>{});
+}
+</script>
+
+<script src="main.js"></script>
+
 </body>
 </html>
