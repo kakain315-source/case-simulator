@@ -7,50 +7,50 @@
 
 <style>
 body {
-  margin: 0;
-  padding: 0;
-  background: #111;
-  color: #fff;
-  font-family: Arial, sans-serif;
-  text-align: center;
+    margin: 0;
+    padding: 0;
+    background: #111;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    text-align: center;
 }
 
 .hidden { display: none; }
 
 input, button, select {
-  padding: 10px;
-  margin: 6px;
-  border-radius: 6px;
-  border: none;
-  font-size: 16px;
+    padding: 10px;
+    margin: 6px;
+    border-radius: 6px;
+    border: none;
+    font-size: 16px;
 }
 
 button.primary {
-  background: #ffbe00;
-  color: #000;
-  font-weight: bold;
+    background: #ffbe00;
+    color: #000;
+    font-weight: bold;
 }
 
 button.ghost {
-  background: #333;
-  color: #fff;
+    background: #333;
+    color: #fff;
 }
 
 #auth, #game {
-  padding: 20px;
+    padding: 20px;
 }
 
 #inventory, #shop {
-  margin-top: 20px;
+    margin-top: 20px;
 }
 
 .inv-item {
-  padding: 10px;
-  background: #222;
-  margin: 6px;
-  border-radius: 6px;
-  display: flex;
-  justify-content: space-between;
+    padding: 10px;
+    background: #222;
+    margin: 6px;
+    border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
 }
 
 .rarity-Legend { color: #ff5050; }
@@ -60,54 +60,52 @@ button.ghost {
 .rarity-Common { color: #ccc; }
 
 #reel {
-  display: flex;
-  overflow: hidden;
-  width: 100%;
-  margin-top: 25px;
+    display: flex;
+    overflow: hidden;
+    width: 100%;
+    margin-top: 25px;
 }
 
-.card-inner {
-  width: 180px;
-  margin-right: 12px;
-  padding: 12px;
-  background: #222;
-  border-radius: 6px;
+.card {
+    width: 180px;
+    margin-right: 12px;
+    padding: 12px;
+    background: #222;
+    border-radius: 6px;
 }
 </style>
 </head>
 
 <body>
 
-<!-- 🔐 Авторизация -->
+<!-- Авторизация -->
 <div id="auth">
-  <h2>Вход / Регистрация</h2>
-  <input id="inUser" type="text" placeholder="Имя аккаунта"><br>
-  <input id="inPass" type="password" placeholder="Пароль"><br>
+    <h2>Вход / Регистрация</h2>
+    <input id="inUser" type="text" placeholder="Имя аккаунта"><br>
+    <input id="inPass" type="password" placeholder="Пароль"><br>
 
-  <button id="btnRegister" class="primary">Регистрация</button>
-  <button id="btnLogin" class="ghost">Войти</button>
+    <button id="btnRegister" class="primary">Регистрация</button>
+    <button id="btnLogin" class="ghost">Войти</button>
 </div>
 
-<!-- 🎮 Игра -->
+<!-- Игра -->
 <div id="game" class="hidden">
+    <h2>Аккаунт: <span id="userLabel"></span></h2>
+    <button id="btnProfile" class="ghost">Профиль</button>
 
-  <h2>Аккаунт: <span id="userLabel"></span></h2>
-  <button id="btnProfile" class="ghost">Профиль</button>
+    <h3>Баланс: <span id="balance">0</span>₵</h3>
 
-  <h3>Баланс: <span id="balance">0</span>₵</h3>
+    <h3>Открыть кейс</h3>
+    <select id="caseSelect"></select><br>
+    <button id="openCase" class="primary">Открыть</button>
 
-  <h3>Открыть кейс</h3>
-  <select id="caseSelect"></select><br>
-  <button id="openCase" class="primary">Открыть</button>
+    <div id="reel"></div>
 
-  <div id="reel"></div>
+    <h3>Инвентарь</h3>
+    <div id="inventory"></div>
 
-  <h3>Инвентарь</h3>
-  <div id="inventory"></div>
-
-  <h3>Магазин кейсов</h3>
-  <div id="shop"></div>
-
+    <h3>Магазин кейсов</h3>
+    <div id="shop"></div>
 </div>
 
 <script src="main.js"></script>
