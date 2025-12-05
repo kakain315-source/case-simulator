@@ -1,23 +1,81 @@
 <!doctype html>
-<html lang="en">
+<html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Case Simulator</title>
-    <link rel="manifest" href="manifest.json">
-    <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Standoff — Case Simulator (PWA)</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <div class="app">
+    <header>
+      <h1>Standoff Case Simulator</h1>
+      <div class="top-right">
+        <span id="userLabel"></span>
+        <button id="btnProfile" class="small">Профиль</button>
+      </div>
+    </header>
 
-<div id="app">Loading...</div>
+    <main id="mainArea">
+      <!-- login/register -->
+      <section id="auth" class="card">
+        <h2>Вход / Регистрация</h2>
+        <input id="inUser" placeholder="Имя..." />
+        <input id="inPass" type="password" placeholder="Пароль..." />
+        <div class="row">
+          <button id="btnRegister">Регистрация</button>
+          <button id="btnLogin" class="accent">Войти</button>
+        </div>
+      </section>
 
-<script>
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('service-worker.js').catch(() => {});
-}
-</script>
+      <!-- main game -->
+      <section id="game" class="hidden">
+        <div class="controls">
+          <select id="caseSelect"></select>
+          <button id="openCase" class="big">Открыть кейс (100 монет)</button>
+          <button id="btnAdmin" class="small">Админ</button>
+        </div>
 
-<script src="main.js"></script>
+        <div class="case-area card">
+          <div id="reel" class="reel"></div>
+          <div class="mask"></div>
+        </div>
 
+        <div id="resultArea" class="card">Результат: <span id="resultText">—</span></div>
+
+        <div class="panels">
+          <div class="card">
+            <h3>Инвентарь</h3>
+            <div id="inventory"></div>
+          </div>
+          <div class="card">
+            <h3>Магазин</h3>
+            <div id="shop"></div>
+            <div id="balanceWrap">Монеты: <span id="balance">0</span></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <small>Офлайн: доступно. Для онлайн-multiplayer требуется включить сигналинг-сервер.</small>
+    </footer>
+  </div>
+
+  <!-- Admin modal -->
+  <div id="adminModal" class="modal hidden">
+    <div class="modal-body">
+      <h3>Вход в админку</h3>
+      <input id="adminPass" type="password" placeholder="Пароль" />
+      <div class="row">
+        <button id="adminCancel">Отмена</button>
+        <button id="adminOk" class="accent">Войти</button>
+      </div>
+      <small>Пароль: Mila2010lilia</small>
+    </div>
+  </div>
+
+  <script src="main.js"></script>
 </body>
 </html>
