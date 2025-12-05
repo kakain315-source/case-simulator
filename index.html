@@ -1,416 +1,356 @@
 <!doctype html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Standoff2 Case Simulator (offline)</title>
-  <style>
-    :root{--bg:#0b0b0b;--card:#121212;--accent:#ffd400;--muted:#aaa}
-    html,body{height:100%;margin:0;background:var(--bg);color:#fff;font-family:Inter,Arial,Helvetica,sans-serif}
-    .container{max-width:900px;margin:24px auto;padding:20px}
-    h1{font-size:36px;margin:8px 0}
-    .card{background:var(--card);padding:18px;border-radius:12px;margin:12px 0}
-    label{display:block;margin-bottom:6px;color:var(--muted)}
-    input[type="text"],input[type="password"],select{width:100%;padding:10px;border-radius:8px;border:1px solid #222;background:#0b0b0b;color:#fff}
-    button{background:var(--accent);border:none;padding:10px 14px;border-radius:10px;color:#000;font-weight:700;cursor:pointer}
-    .btn-ghost{background:transparent;border:1px solid #333;color:#fff;padding:8px 12px;border-radius:8px}
-    .row{display:flex;gap:10px}
-    .row > *{flex:1}
-    .hidden{display:none}
-    .shop-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #111}
-    #reel{display:flex;gap:12px;overflow:hidden;padding:12px;align-items:center;height:120px}
-    .card-item{background:#0a0a0a;padding:12px;border-radius:8px;min-width:160px;text-align:center}
-    .inv-item{display:flex;justify-content:space-between;padding:8px;border-bottom:1px solid #111}
-    .modal{position:fixed;left:0;top:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.6)}
-    .modal .box{background:var(--card);padding:18px;border-radius:12px;width:90%;max-width:420px}
-    .muted{color:var(--muted)}
-    .label-inline{display:inline-block;margin-right:8px;color:var(--muted)}
-    .center{text-align:center}
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Standoff Case Simulator (offline)</title>
+<style>
+  :root{--bg:#0b0b0b;--card:#111;--muted:#aaa;--accent:#ffd200;--danger:#e74;}
+  html,body{height:100%;margin:0;font-family:Inter,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:#fff}
+  .wrap{max-width:900px;margin:20px auto;padding:20px}
+  h1{font-size:40px;margin:0 0 18px}
+  .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+  .card{background:var(--card);padding:14px;border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,.6)}
+  input,select,button{font-size:15px;padding:8px;border-radius:8px;border:0;outline:0}
+  input{background:#222;color:#fff}
+  .muted{color:var(--muted)}
+  button.primary{background:var(--accent);color:#000;padding:8px 12px}
+  button.ghost{background:#222;border:1px solid #333;color:#fff;padding:8px 12px}
+  .hidden{display:none}
+  #reel{display:flex;gap:12px;overflow:hidden;height:120px;margin-top:16px;align-items:center}
+  .card .card-inner{min-width:180px;padding:12px;background:#0f0f0f;border-radius:10px;text-align:center}
+  .rarity-Legend{color:#f8c06d;font-weight:700}
+  .rarity-Epic{color:#c57bf8;font-weight:700}
+  .rarity-Rare{color:#68c0ff;font-weight:700}
+  .rarity-Uncommon{color:#b8ff6a;font-weight:700}
+  .rarity-Common{color:#ddd;font-weight:700}
+  #inventory .inv-item{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px dashed #222}
+  .small{font-size:13px;color:var(--muted)}
+  #adminModal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6)}
+  #adminBox{background:var(--card);padding:18px;border-radius:12px;min-width:280px}
+</style>
 </head>
 <body>
-  <div class="container">
+<div class="wrap">
+  <div class="row">
     <h1>Standoff Case Simulator</h1>
+    <div style="margin-left:auto">
+      <button id="btnProfile" class="ghost">Профиль</button>
+    </div>
+  </div>
 
-    <div id="auth" class="card">
-      <h2>Вход / Регистрация</h2>
-      <div class="row">
-        <input id="inUser" type="text" placeholder="Имя..." />
-        <input id="inPass" type="password" placeholder="Пароль..." />
+  <!-- auth -->
+  <div id="auth" class="card" style="margin-top:14px">
+    <h2>Вход / Регистрация</h2>
+    <div class="row" style="margin-top:8px">
+      <input id="inUser" placeholder="Имя..." />
+      <input id="inPass" placeholder="Пароль..." type="password" />
+      <button id="btnRegister" class="primary">Регистрация</button>
+      <button id="btnLogin" class="ghost">Войти</button>
+    </div>
+    <p class="small muted" style="margin-top:10px">Офлайн: доступно. Для онлайн нужно подключать сервер.</p>
+  </div>
+
+  <!-- main game -->
+  <div id="game" class="card hidden" style="margin-top:14px">
+    <div class="row" style="justify-content:space-between;align-items:center">
+      <div>
+        <div id="userLabel" style="font-weight:700"></div>
+        <div class="small">Баланс: <span id="balance">0</span>₵</div>
       </div>
-      <div style="margin-top:10px;display:flex;gap:8px">
-        <button id="btnRegister">Регистрация</button>
-        <button id="btnLogin" class="btn-ghost">Войти</button>
-        <div style="flex:1"></div>
-        <button id="btnProfile" class="btn-ghost">Профиль</button>
-        <button id="btnAdmin" class="btn-ghost">Админ</button>
+      <div>
+        <select id="caseSelect"></select>
+        <button id="openCase" class="primary">Открыть кейс</button>
+        <button id="btnAdmin" class="ghost">Админ</button>
       </div>
-      <div style="margin-top:10px;color:var(--muted)">Офлайн: доступно. Для онлайн — сервер нужен.</div>
     </div>
 
-    <div id="game" class="card hidden">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div>
-          <div class="muted">Игрок:</div>
-          <div id="userLabel" style="font-weight:700;font-size:18px"></div>
-        </div>
-        <div>
-          <div class="muted">Баланс</div>
-          <div id="balance" style="font-weight:700;font-size:18px">0</div>
-        </div>
-      </div>
+    <div id="reel" style="margin-top:12px"></div>
 
-      <div style="margin-top:12px">
-        <label>Выберите кейс</label>
-        <select id="caseSelect"></select>
-        <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
-          <button id="openCase">Open Case</button>
-          <div id="resultText" style="margin-left:12px;font-weight:700"></div>
-        </div>
+    <div style="display:flex;gap:12px;margin-top:14px">
+      <div class="card" style="flex:1">
+        <h3>Инвентарь</h3>
+        <div id="inventory" class="small muted">Пусто</div>
       </div>
-
-      <div style="margin-top:16px" class="card">
+      <div class="card" style="width:260px">
         <h3>Магазин</h3>
         <div id="shop"></div>
       </div>
-
-      <div style="margin-top:16px" class="card">
-        <h3>Инвентарь</h3>
-        <div id="inventory" class="muted">Пусто</div>
-      </div>
     </div>
   </div>
+</div>
 
-  <!-- admin modal -->
-  <div id="adminModal" class="modal hidden" aria-hidden="true">
-    <div class="box">
-      <h3>Вход в админку</h3>
-      <label class="muted">Пароль</label>
-      <input id="adminPass" type="password" placeholder="Пароль" />
-      <div style="display:flex;gap:8px;margin-top:10px">
-        <button id="adminOk">Войти</button>
-        <button id="adminCancel" class="btn-ghost">Отмена</button>
-      </div>
-      <div class="muted" style="margin-top:12px">Пароль хранится в зашифрованном виде (хеш).</div>
+<!-- admin modal -->
+<div id="adminModal" class="hidden">
+  <div id="adminBox">
+    <h3>Вход в админку</h3>
+    <input id="adminPass" placeholder="Пароль" type="password" style="width:100%;margin-top:8px" />
+    <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end">
+      <button id="adminCancel" class="ghost">Отмена</button>
+      <button id="adminOk" class="primary">Войти</button>
     </div>
+    <div class="small muted" style="margin-top:10px">Пароль скрыт и сравнивается по хешу (SHA-256).</div>
   </div>
+</div>
 
-  <!-- CryptoJS (MD5) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+<script>
+(async function(){
 
-  <script>
-  /* Полный рабочий inline-скрипт — вставь как index.html */
-  (function(){
-    // ---- data model ----
-    const CASES = [
-      { id:'rival', name:'Rival Case', price:100, rarities:{Common:60,Uncommon:25,Rare:10,Epic:4,Legend:1},
-        items:[
-          {name:'Knife Rust', rarity:'Legend'},
-          {name:'Rifle Storm', rarity:'Epic'},
-          {name:'SMG Urban', rarity:'Rare'},
-          {name:'Pistol Sand', rarity:'Uncommon'},
-          {name:'Ammo Pack', rarity:'Common'}
-        ]},
-      { id:'origin', name:'Origin Case', price:80, rarities:{Common:62,Uncommon:23,Rare:10,Epic:4,Legend:1},
-        items:[
-          {name:'Shotgun Maple', rarity:'Rare'},
-          {name:'Rifle Bronze', rarity:'Uncommon'},
-          {name:'Pistol Classic', rarity:'Common'},
-          {name:'AWP Ember', rarity:'Legend'},
-          {name:'SMG Neon', rarity:'Epic'}
-        ]}
-    ];
+/* ===== data ===== */
+const CASES = [
+  { id:'rival', name:'Rival Case', price:100, rarities:{Common:60,Uncommon:25,Rare:10,Epic:4,Legend:1},
+    items:[
+      {name:'Knife Rust', rarity:'Legend'},
+      {name:'Rifle Storm', rarity:'Epic'},
+      {name:'SMG Urban', rarity:'Rare'},
+      {name:'Pistol Sand', rarity:'Uncommon'},
+      {name:'Ammo Pack', rarity:'Common'}
+    ]},
+  { id:'origin', name:'Origin Case', price:80, rarities:{Common:62,Uncommon:23,Rare:10,Epic:4,Legend:1},
+    items:[
+      {name:'Shotgun Maple', rarity:'Rare'},
+      {name:'Rifle Bronze', rarity:'Uncommon'},
+      {name:'Pistol Classic', rarity:'Common'},
+      {name:'AWP Ember', rarity:'Legend'},
+      {name:'SMG Neon', rarity:'Epic'}
+    ]}
+];
 
-    const DEFAULT_STATE = { users: {}, currentUser: null };
+const DEFAULT_STATE = { users:{}, currentUser: null };
 
-    // helpers
-    const $ = id => document.getElementById(id);
-    function saveState(s){ localStorage.setItem('caseSimState', JSON.stringify(s)); }
-    function loadState(){ try { return JSON.parse(localStorage.getItem('caseSimState')) || DEFAULT_STATE; } catch(e){ return DEFAULT_STATE; } }
+/* ===== helpers ===== */
+const $ = id => document.getElementById(id);
+function saveState(state){ localStorage.setItem('caseSimState', JSON.stringify(state)); }
+function loadState(){ try{ return JSON.parse(localStorage.getItem('caseSimState')) || DEFAULT_STATE; }catch(e){ return DEFAULT_STATE; } }
+let STORE = loadState();
 
-    let STORE = loadState();
+// SHA-256 helper -> hex
+async function sha256Hex(str){
+  const enc = new TextEncoder().encode(str);
+  const buf = await crypto.subtle.digest('SHA-256', enc);
+  return Array.prototype.map.call(new Uint8Array(buf), x=>('00'+x.toString(16)).slice(-2)).join('');
+}
 
-    function ensureUser(name){
-      if(!STORE.users[name]) {
-        STORE.users[name] = { coins: 500, inventory: [] };
-        saveState(STORE);
-      }
+/* ===== UI refs ===== */
+const auth = $('auth'), game = $('game');
+const inUser = $('inUser'), inPass = $('inPass');
+const btnRegister = $('btnRegister'), btnLogin = $('btnLogin'), userLabel = $('userLabel'), btnProfile = $('btnProfile');
+const caseSelect = $('caseSelect'), openCase = $('openCase'), reel = $('reel'), btnAdmin = $('btnAdmin');
+const inventoryEl = $('inventory'), shopEl = $('shop'), balanceEl = $('balance');
+const adminModal = $('adminModal'), adminOk = $('adminOk'), adminCancel = $('adminCancel'), adminPass = $('adminPass');
+
+/* ===== ADMIN: set ADMIN_HASH to SHA-256 hex of desired password =====
+   IMPORTANT: Do NOT put plain password here. Replace the hex below with:
+     await sha256Hex('your_password_here')
+   For quick setup you can compute hash once and paste.
+*/
+const ADMIN_HASH = "REPLACE_WITH_SHA256_HEX"; // <-- Замените на хеш SHA-256 вашего пароля
+
+/* ===== state helpers ===== */
+function ensureUser(name){
+  if(!STORE.users[name]) {
+    STORE.users[name] = { passwordHash: '', coins:500, inventory:[] };
+    saveState(STORE);
+  }
+}
+
+/* ===== UI init ===== */
+function initUI(){
+  CASES.forEach(c=>{
+    const o = document.createElement('option'); o.value = c.id; o.textContent = `${c.name} — ${c.price}₵`; caseSelect.appendChild(o);
+  });
+  renderShop(); refreshAuthUI();
+}
+function refreshAuthUI(){
+  if(STORE.currentUser){
+    auth.classList.add('hidden'); game.classList.remove('hidden');
+    userLabel.textContent = STORE.currentUser;
+    btnProfile.textContent = 'Выйти';
+    refreshBalance(); renderInventory();
+  } else {
+    auth.classList.remove('hidden'); game.classList.add('hidden');
+    userLabel.textContent = ''; btnProfile.textContent = 'Профиль';
+  }
+}
+
+btnProfile.addEventListener('click', ()=>{
+  if(STORE.currentUser){
+    STORE.currentUser = null; saveState(STORE); refreshAuthUI();
+  } else {
+    inUser.focus();
+  }
+});
+
+/* ===== register / login ===== */
+btnRegister.addEventListener('click', async ()=>{
+  const name = inUser.value.trim(); const pass = inPass.value.trim();
+  if(!name || !pass) return alert('Введите имя и пароль');
+  if(STORE.users[name]) return alert('Пользователь существует');
+  const ph = await sha256Hex(pass);
+  STORE.users[name] = { passwordHash: ph, coins:500, inventory:[] };
+  STORE.currentUser = name; saveState(STORE); refreshAuthUI();
+});
+btnLogin.addEventListener('click', async ()=>{
+  const name = inUser.value.trim(); const pass = inPass.value.trim();
+  if(!name || !pass) return alert('Введите имя и пароль');
+  if(!STORE.users[name]) return alert('Пользователь не найден');
+  const ph = await sha256Hex(pass);
+  if(STORE.users[name].passwordHash && STORE.users[name].passwordHash !== ph) return alert('Неверные данные');
+  // if stored user has empty passwordHash (created by ensureUser), allow login? no — require password set
+  if(!STORE.users[name].passwordHash) {
+    // if account had default empty hash, set password now
+    STORE.users[name].passwordHash = ph;
+  }
+  STORE.currentUser = name; saveState(STORE); refreshAuthUI();
+});
+
+/* ===== render shop/inventory ===== */
+function refreshBalance(){ if(!STORE.currentUser) return balanceEl.textContent = '0'; balanceEl.textContent = STORE.users[STORE.currentUser].coins || 0; }
+function renderInventory(){
+  inventoryEl.innerHTML = '';
+  if(!STORE.currentUser) return;
+  const inv = STORE.users[STORE.currentUser].inventory || [];
+  if(inv.length === 0) { inventoryEl.textContent = 'Пусто'; return; }
+  inv.forEach((it, idx)=>{
+    const el = document.createElement('div'); el.className='inv-item';
+    el.innerHTML = `<div><span class="rarity-${it.rarity}">${it.name}</span></div><div><button data-idx="${idx}" class="ghost">Продать (50%)</button></div>`;
+    inventoryEl.appendChild(el);
+  });
+  inventoryEl.querySelectorAll('button').forEach(b=> b.addEventListener('click', e=>{
+    const i = +e.target.dataset.idx; sellItem(i);
+  }));
+}
+function renderShop(){
+  shopEl.innerHTML = '';
+  CASES.forEach(c=>{
+    const el = document.createElement('div'); el.className='shop-item'; el.style.marginTop='6px';
+    el.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center"><div>${c.name} — ${c.price}₵</div><button data-id="${c.id}" class="primary">Купить</button></div>`;
+    shopEl.appendChild(el);
+  });
+  shopEl.querySelectorAll('button').forEach(b=> b.addEventListener('click', e=>{
+    const id = e.target.dataset.id; buyCase(id);
+  }));
+}
+
+/* ===== shop / sell ===== */
+function buyCase(id){
+  if(!STORE.currentUser) return alert('Авторизуйтесь');
+  const c = CASES.find(x=>x.id===id); const user = STORE.users[STORE.currentUser];
+  if(user.coins < c.price) return alert('Недостаточно монет');
+  user.coins -= c.price; saveState(STORE); refreshBalance(); openCaseByObj(c);
+}
+function sellItem(index){
+  const user = STORE.users[STORE.currentUser]; const it = user.inventory.splice(index,1)[0];
+  const gained = Math.max(10, Math.floor(getRarityValue(it.rarity)*0.5));
+  user.coins += gained; saveState(STORE); refreshBalance(); renderInventory(); alert(`Продано за ${gained}₵`);
+}
+function getRarityValue(r){ switch(r){case 'Legend': return 500; case 'Epic': return 200; case 'Rare': return 100; case 'Uncommon': return 50; default: return 20;} }
+
+/* ===== random / case open animation ===== */
+function weightedPick(weights){
+  const entries = Object.entries(weights); const total = entries.reduce((s,[,v])=>s+v,0);
+  let r = Math.random()*total;
+  for(const [k,w] of entries){ if(r < w) return k; r -= w; } return entries[0][0];
+}
+function pickItemFromCase(c){
+  const rarity = weightedPick(c.rarities); const pool = c.items.filter(i=>i.rarity===rarity);
+  if(pool.length===0) return c.items[Math.floor(Math.random()*c.items.length)];
+  return pool[Math.floor(Math.random()*pool.length)];
+}
+
+let isSpinning = false;
+function openCaseByObj(c){
+  if(!STORE.currentUser) return alert('Авторизуйтесь');
+  if(isSpinning) return;
+  isSpinning = true; openCase.disabled = true;
+
+  reel.innerHTML = '';
+  const finalItem = pickItemFromCase(c);
+  const cards = [];
+  // fill with random and final
+  for(let i=0;i<12;i++) cards.push(c.items[Math.floor(Math.random()*c.items.length)]);
+  // cycles
+  for(let t=0;t<6;t++) c.items.forEach(it=>cards.push(it));
+  cards.push(finalItem);
+  for(let i=0;i<8;i++) cards.push(c.items[Math.floor(Math.random()*c.items.length)]);
+
+  cards.forEach(it=>{
+    const node = document.createElement('div'); node.className='card-inner';
+    const wrapper = document.createElement('div'); wrapper.className='card';
+    wrapper.appendChild(node);
+    node.innerHTML = `<div style="font-weight:700">${it.name}</div><div class="rarity ${'rarity-'+it.rarity}">${it.rarity}</div>`;
+    reel.appendChild(wrapper);
+  });
+
+  // compute center
+  const cardW = 180 + 12; // approx
+  const centerIndex = Math.floor(reel.children.length/2);
+  let targetIdx = Array.from(reel.children).findIndex((n,i)=> n.textContent.includes(finalItem.name) && i>10);
+  if(targetIdx < 0) targetIdx = Math.floor(reel.children.length/2);
+  const offset = (targetIdx - centerIndex) * cardW;
+
+  requestAnimationFrame(()=> {
+    reel.style.transition = 'transform 2.6s cubic-bezier(.22,.95,.12,1)';
+    reel.style.transform = `translateX(-${offset}px)`;
+  });
+
+  setTimeout(()=> {
+    isSpinning = false; openCase.disabled = false;
+    const user = STORE.users[STORE.currentUser];
+    user.inventory.push(finalItem); saveState(STORE); refreshBalance(); renderInventory();
+    alert(`Поздравляем! Вы получили: ${finalItem.name} (${finalItem.rarity})`);
+    setTimeout(()=>{ reel.style.transition='none'; reel.style.transform='none'; reel.innerHTML=''; }, 120);
+  }, 2700);
+}
+
+/* ===== admin handling ===== */
+btnAdmin.addEventListener('click', ()=>{ adminModal.classList.remove('hidden'); adminPass.value=''; adminPass.focus(); });
+adminCancel.addEventListener('click', ()=>{ adminModal.classList.add('hidden'); });
+
+adminOk.addEventListener('click', async ()=>{
+  const entered = adminPass.value.trim();
+  if(!entered) return alert('Введите пароль');
+  if(ADMIN_HASH === "REPLACE_WITH_SHA256_HEX"){ alert('В файле не задан ADMIN_HASH — замените значение ADMIN_HASH на SHA-256(ваш_пароль)'); return; }
+  const h = await sha256Hex(entered);
+  if(h === ADMIN_HASH){
+    adminModal.classList.add('hidden');
+    if(STORE.currentUser){
+      STORE.users[STORE.currentUser].coins = 999999999; saveState(STORE); refreshBalance();
+      alert('Админ: баланс обновлён');
+    } else {
+      alert('Сначала войдите в аккаунт');
     }
+  } else {
+    alert('Неверный пароль');
+  }
+});
 
-    // UI refs
-    const auth = $('auth'), game = $('game');
-    const inUser = $('inUser'), inPass = $('inPass');
-    const btnRegister = $('btnRegister'), btnLogin = $('btnLogin'), userLabel = $('userLabel'), btnProfile = $('btnProfile');
-    const caseSelect = $('caseSelect'), openCase = $('openCase'), resultText = $('resultText');
-    const inventoryEl = $('inventory'), shopEl = $('shop'), balanceEl = $('balance'), btnAdmin = $('btnAdmin');
-    const adminModal = $('adminModal'), adminOk = $('adminOk'), adminCancel = $('adminCancel'), adminPass = $('adminPass');
+/* ===== buy/open attach ===== */
+openCase.addEventListener('click', ()=>{
+  const id = caseSelect.value;
+  const c = CASES.find(x=>x.id===id);
+  if(!STORE.currentUser) return alert('Авторизуйтесь');
+  const user = STORE.users[STORE.currentUser];
+  if(user.coins < c.price) return alert('Недостаточно монет');
+  user.coins -= c.price; saveState(STORE); refreshBalance();
+  openCaseByObj(c);
+});
 
-    // admin hash for password "333" (MD5)
-    const ADMIN_HASH = CryptoJS.MD5('333').toString();
+/* ===== ensure user helper for legacy flows ===== */
+function ensureUserLegacy(name){
+  if(!STORE.users[name]){
+    STORE.users[name] = { passwordHash: '', coins:500, inventory:[] };
+    saveState(STORE);
+  }
+}
 
-    // init after DOM ready
-    document.addEventListener('DOMContentLoaded', ()=> {
-      initUI();
-    });
+/* expose for debugging (optional) */
+window.buyCase = buyCase;
 
-    function initUI(){
-      // fill cases
-      CASES.forEach(c => {
-        const o = document.createElement('option'); o.value = c.id; o.textContent = `${c.name} — ${c.price}₵`; caseSelect.appendChild(o);
-      });
+/* init */
+initUI();
 
-      renderShop();
-      refreshAuthUI();
-
-      // attach handlers (safe - DOM ready)
-      btnRegister.addEventListener('click', onRegister);
-      btnLogin.addEventListener('click', onLogin);
-      btnProfile.addEventListener('click', onProfile);
-      btnAdmin.addEventListener('click', ()=>{ adminModal.classList.remove('hidden'); adminPass.value=''; adminPass.focus(); });
-      adminCancel.addEventListener('click', ()=>adminModal.classList.add('hidden'));
-      adminOk.addEventListener('click', onAdminOk);
-      openCase.addEventListener('click', onOpenCase);
-    }
-
-    function refreshAuthUI(){
-      if(STORE.currentUser){
-        auth.classList.add('hidden'); game.classList.remove('hidden');
-        userLabel.textContent = STORE.currentUser;
-        renderInventory();
-        refreshBalance();
-      } else {
-        auth.classList.remove('hidden'); game.classList.add('hidden');
-        userLabel.textContent = '';
-      }
-    }
-
-    function onProfile(){
-      if(STORE.currentUser){
-        // logout
-        STORE.currentUser = null; saveState(STORE); refreshAuthUI();
-        alert('Вы вышли');
-      } else {
-        inUser.focus();
-      }
-    }
-
-    function onRegister(){
-      const name = inUser.value.trim(); const pass = inPass.value.trim();
-      if(!name || !pass) return alert('Введите имя и пароль');
-      if(STORE.users[name]) return alert('Пользователь существует');
-      STORE.users[name] = { passwordHash: CryptoJS.SHA256(pass).toString(), coins: 500, inventory: [] };
-      STORE.currentUser = name; saveState(STORE);
-      ensureUser(name);
-      refreshAuthUI();
-    }
-
-    function onLogin(){
-      const name = inUser.value.trim(); const pass = inPass.value.trim();
-      if(!name || !pass) return alert('Введите имя и пароль');
-      const u = STORE.users[name];
-      if(!u || u.passwordHash !== CryptoJS.SHA256(pass).toString()) return alert('Неверные данные');
-      STORE.currentUser = name; saveState(STORE); refreshAuthUI();
-    }
-
-    function refreshBalance(){
-      if(!STORE.currentUser) return balanceEl.textContent = '0';
-      balanceEl.textContent = STORE.users[STORE.currentUser].coins || 0;
-    }
-
-    function renderInventory(){
-      inventoryEl.innerHTML = '';
-      if(!STORE.currentUser) return inventoryEl.textContent='Пусто';
-      const inv = STORE.users[STORE.currentUser].inventory || [];
-      if(inv.length === 0) inventoryEl.textContent = 'Пусто';
-      inv.forEach((it, idx) => {
-        const el = document.createElement('div'); el.className='inv-item';
-        el.innerHTML = `<div><strong>${it.name}</strong> <span class="muted">(${it.rarity})</span></div><button data-idx="${idx}">Продать (50%)</button>`;
-        inventoryEl.appendChild(el);
-      });
-      inventoryEl.querySelectorAll('button').forEach(b=>{
-        b.addEventListener('click', e=>{
-          const i = +e.target.dataset.idx;
-          sellItem(i);
-        });
-      });
-    }
-
-    function renderShop(){
-      shopEl.innerHTML = '';
-      CASES.forEach(c=>{
-        const el = document.createElement('div'); el.className='shop-item';
-        el.innerHTML = `<div>${c.name} — ${c.price}₵</div><button data-id="${c.id}">Купить кейс</button>`;
-        shopEl.appendChild(el);
-      });
-      shopEl.querySelectorAll('button').forEach(b=>{
-        b.addEventListener('click', e=>{
-          const id = e.target.dataset.id;
-          buyCase(id);
-        });
-      });
-    }
-
-    function buyCase(id){
-      if(!STORE.currentUser) return alert('Авторизуйтесь');
-      const c = CASES.find(x=>x.id===id);
-      const user = STORE.users[STORE.currentUser];
-      if(user.coins < c.price) return alert('Недостаточно монет');
-      user.coins -= c.price;
-      saveState(STORE); refreshBalance();
-      openCaseByObj(c);
-    }
-
-    function sellItem(index){
-      const user = STORE.users[STORE.currentUser];
-      const it = user.inventory.splice(index,1)[0];
-      const gained =  Math.max(10, Math.floor((getRarityValue(it.rarity))*0.5));
-      user.coins += gained; saveState(STORE); refreshBalance(); renderInventory();
-      alert(`Продано за ${gained}₵`);
-    }
-
-    function getRarityValue(r){
-      switch(r){case 'Legend': return 500; case 'Epic': return 200; case 'Rare': return 100; case 'Uncommon': return 50; default: return 20;}
-    }
-
-    // ---- case logic & animation ----
-    function weightedPick(weights){
-      const entries = Object.entries(weights);
-      const total = entries.reduce((s,[,v])=>s+v,0);
-      let r = Math.random()*total;
-      for(const [k,w] of entries){
-        if(r < w) return k;
-        r -= w;
-      }
-      return entries[0][0];
-    }
-
-    function pickItemFromCase(c){
-      const rarity = weightedPick(c.rarities);
-      const pool = c.items.filter(i => i.rarity === rarity);
-      if(pool.length === 0) return c.items[Math.floor(Math.random()*c.items.length)];
-      return pool[Math.floor(Math.random()*pool.length)];
-    }
-
-    let isSpinning = false;
-    const reel = document.createElement('div'); // temp reel inserted into DOM when used
-
-    function openCaseByObj(c){
-      if(!STORE.currentUser) return alert('Авторизуйтесь');
-      if(isSpinning) return;
-      isSpinning = true;
-      openCase.disabled = true;
-
-      // create reel wrapper inside a card area
-      let reelWrap = document.getElementById('reelWrap');
-      if(!reelWrap){
-        reelWrap = document.createElement('div'); reelWrap.id='reelWrap'; reelWrap.className='card'; reelWrap.style.marginTop='12px';
-        const container = game;
-        container.insertBefore(reelWrap, container.children[2] || null);
-      }
-      reelWrap.innerHTML = '';
-      reelWrap.appendChild(reel);
-      reel.id='reel';
-      reel.style.transition='none';
-      reel.style.transform='none';
-      reel.innerHTML='';
-
-      const finalItem = pickItemFromCase(c);
-      // fill items
-      const cycles = 6;
-      for(let t=0;t<cycles;t++){
-        c.items.forEach(it=>{
-          const node = document.createElement('div'); node.className='card-item';
-          node.innerHTML = `<div style="font-weight:700">${it.name}</div><div class="muted">${it.rarity}</div>`;
-          reel.appendChild(node);
-        });
-      }
-      // final
-      const finalNode = document.createElement('div'); finalNode.className='card-item';
-      finalNode.innerHTML = `<div style="font-weight:900">${finalItem.name}</div><div style="color:${finalItem.rarity==='Legend'?'gold':'#ffd400'}">${finalItem.rarity}</div>`;
-      reel.appendChild(finalNode);
-      // tail
-      for(let i=0;i<6;i++){
-        const it = c.items[Math.floor(Math.random()*c.items.length)];
-        const node = document.createElement('div'); node.className='card-item';
-        node.innerHTML = `<div style="font-weight:700">${it.name}</div><div class="muted">${it.rarity}</div>`;
-        reel.appendChild(node);
-      }
-
-      // animate: compute offset to center the final item roughly
-      const cardW = 172; // approximate card width including gap
-      const total = reel.children.length;
-      const centerIndex = Math.floor(total/2);
-      // find index of finalNode (it's the cycles*c.items.length)
-      let targetIdx = Array.prototype.indexOf.call(reel.children, finalNode);
-      if(targetIdx<0) targetIdx = centerIndex;
-      const offset = (targetIdx - centerIndex) * cardW;
-
-      // animate
-      requestAnimationFrame(()=>{
-        reel.style.transition = 'transform 2.6s cubic-bezier(.22,.95,.12,1)';
-        reel.style.transform = `translateX(-${offset}px)`;
-      });
-
-      setTimeout(()=>{
-        isSpinning = false; openCase.disabled = false;
-        const user = STORE.users[STORE.currentUser];
-        user.inventory.push(finalItem);
-        saveState(STORE);
-        refreshBalance(); renderInventory();
-        resultText.textContent = `${finalItem.name} (${finalItem.rarity})`;
-        // small popup
-        setTimeout(()=> alert(`Поздравляем! Вы получили: ${finalItem.name} (${finalItem.rarity})`), 100);
-        setTimeout(()=>{ reel.style.transition='none'; reel.style.transform='none'; reelWrap.remove(); }, 120);
-      }, 2800);
-    }
-
-    // admin handler
-    function onAdminOk(){
-      const entered = adminPass.value.trim();
-      // compare md5 hash of entered to ADMIN_HASH (MD5('333'))
-      const h = CryptoJS.MD5(entered).toString();
-      if(h === ADMIN_HASH){
-        adminModal.classList.add('hidden');
-        if(STORE.currentUser){ STORE.users[STORE.currentUser].coins = 999999999; saveState(STORE); refreshBalance(); alert('Админ: монеты обновлены'); }
-        else alert('Сначала войдите в аккаунт');
-      } else {
-        alert('Неверный пароль');
-      }
-    }
-
-    function onOpenCase(){
-      const id = caseSelect.value;
-      const c = CASES.find(x=>x.id===id);
-      if(!STORE.currentUser) return alert('Авторизуйтесь');
-      const user = STORE.users[STORE.currentUser];
-      if(user.coins < c.price) return alert('Недостаточно монет');
-      user.coins -= c.price; saveState(STORE); refreshBalance();
-      openCaseByObj(c);
-    }
-
-    // init state helper used by register flow
-    function ensureUser(name){
-      if(!STORE.users[name]) {
-        STORE.users[name] = { passwordHash: '', coins: 500, inventory: [] };
-        saveState(STORE);
-      }
-    }
-
-    // expose buyCase for shop buttons
-    function buyCase(id){
-      if(!STORE.currentUser) return alert('Авторизуйтесь');
-      const c = CASES.find(x=>x.id===id);
-      const user = STORE.users[STORE.currentUser];
-      if(user.coins < c.price) return alert('Недостаточно монет');
-      user.coins -= c.price;
-      saveState(STORE); refreshBalance();
-      openCaseByObj(c);
-    }
-
-    // legacy ensureUser definition already above; keep consistent
-    window.buyCase = buyCase;
-
-  })();
-  </script>
+})(); // end IIFE
+</script>
 </body>
 </html>
