@@ -1,44 +1,27 @@
-const CACHE_NAME = "blazecase-cache-v1";
-const FILES_TO_CACHE = [
-    "/",
-    "/index.html",
-    "/standoff_autonomous.html",
-    "/manifest.json",
-    "/icon-192.png",
-    "/icon-512.png"
-];
-
-// Установка SW
-self.addEventListener("install", (e) => {
-    e.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => {
-            return cache.addAll(FILES_TO_CACHE);
-        })
-    );
-    self.skipWaiting();
+self.addEventListener("install", (event) => {
+  console.log("SW: installed");
+  event.waitUntil(
+    caches.open("blaze-cache-v1").then((cache) => {
+      return cache.addAll([
+        "./",
+        "./index.html",
+        "./manifest.json",
+        "./icon-192.png",
+        "./icon-512.png"
+      ]);
+    })
+  );
 });
 
-// Активация
-self.addEventListener("activate", (e) => {
-    e.waitUntil(
-        caches.keys().then((keyList) => {
-            return Promise.all(
-                keyList.map((key) => {
-                    if (key !== CACHE_NAME) {
-                        return caches.delete(key);
-                    }
-                })
-            );
-        })
-    );
-    self.clients.claim();
+self.addEventListener("activate", (event) => {
+  console.log("SW: activated");
+  event.waitUntil(self.clients.claim());
 });
 
-// Обработка запросов
-self.addEventListener("fetch", (e) => {
-    e.respondWith(
-        caches.match(e.request).then((response) => {
-            return response || fetch(e.request);
-        })
-    );
+self.addEventListener("fetch", (event) => {
+  event.respondWith(
+    caches.match(event.request).then((resp) => {
+      return resp || fetch(event.request);
+    })
+  );
 });
