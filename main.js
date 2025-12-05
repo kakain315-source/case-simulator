@@ -6,6 +6,7 @@ app.innerHTML = `
     <div id="result"></div>
 `;
 
+// Предметы и шансы
 const items = [
     { name: "Common Item", chance: 60 },
     { name: "Uncommon Item", chance: 25 },
@@ -14,6 +15,7 @@ const items = [
     { name: "Legendary Item", chance: 1 }
 ];
 
+// Обработка клика
 document.getElementById("openCase").addEventListener("click", () => {
     const roll = Math.random() * 100;
     let cumulative = 0;
