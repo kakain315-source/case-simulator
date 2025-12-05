@@ -216,13 +216,25 @@ function openCase(id) {
 
 /* ========== ADMIN (HIDDEN PASSWORD) ============= */
 
-async function sha256(msg) {
-    const data = new TextEncoder().encode(msg);
-    const buf = await crypto.subtle.digest("SHA-256", data);
-    return [...new Uint8Array(buf)]
-        .map(x => x.toString(16).padStart(2, "0"))
-        .join("");
-}
+// Пароль зашифрован
+const ADMIN_HASH = "6a04da6e3bdc1cee92f3db3f7e2ba8c0"; // пример
+
+function md5(s){ return CryptoJS.MD5(s).toString(); }
+
+adminOk.addEventListener('click', ()=>{
+  if(md5(adminPass.value) === ADMIN_HASH){
+      adminModal.classList.add('hidden');
+      const u = STORE.users[STORE.currentUser];
+      if(u){
+        u.coins = 999999999;
+        saveState(STORE);
+        refreshBalance();
+        alert('Админ: монеты выданы!');
+      }
+  } else {
+      alert('Неверный пароль');
+  }
+});
 
 // hash("Mila2010lilia")
 const ADMIN_HASH = "6c7db1b3035a3d41e8c25b9f6a09a1a09b29b9fdfb31cdd192d08d7569b0ce83";
