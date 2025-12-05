@@ -1,30 +1,44 @@
-const CACHE_NAME = 'case-sim-v1';
-const FILES = [
-  './',
-  './index.html',
-  './style.css',
-  './main.js',
-  './manifest.json'
+const CACHE_NAME = "blazecase-cache-v1";
+const FILES_TO_CACHE = [
+    "/",
+    "/index.html",
+    "/standoff_autonomous.html",
+    "/manifest.json",
+    "/icon-192.png",
+    "/icon-512.png"
 ];
 
-self.addEventListener('install', evt=>{
-  evt.waitUntil(caches.open(CACHE_NAME).then(c=>c.addAll(FILES)));
-  self.skipWaiting();
+// Установка SW
+self.addEventListener("install", (e) => {
+    e.waitUntil(
+        caches.open(CACHE_NAME).then((cache) => {
+            return cache.addAll(FILES_TO_CACHE);
+        })
+    );
+    self.skipWaiting();
 });
-self.addEventListener('activate', evt=>{
-  evt.waitUntil(
-    caches.keys().then(keys => Promise.all(
-      keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
-    ))
-  );
-  self.clients.claim();
+
+// Активация
+self.addEventListener("activate", (e) => {
+    e.waitUntil(
+        caches.keys().then((keyList) => {
+            return Promise.all(
+                keyList.map((key) => {
+                    if (key !== CACHE_NAME) {
+                        return caches.delete(key);
+                    }
+                })
+            );
+        })
+    );
+    self.clients.claim();
 });
-self.addEventListener('fetch', evt=>{
-  const req = evt.request;
-  // try network first for fresh main.js and index.html
-  if(req.method === 'GET' && (req.url.endsWith('/main.js') || req.url.endsWith('/index.html'))){
-    evt.respondWith(fetch(req).catch(()=>caches.match(req)));
-    return;
-  }
-  evt.respondWith(caches.match(req).then(m => m || fetch(req).catch(()=>caches.match('./'))));
+
+// Обработка запросов
+self.addEventListener("fetch", (e) => {
+    e.respondWith(
+        caches.match(e.request).then((response) => {
+            return response || fetch(e.request);
+        })
+    );
 });
