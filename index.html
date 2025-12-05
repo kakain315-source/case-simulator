@@ -1,113 +1,165 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Case Simulator</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body {
-    margin: 0;
-    padding: 0;
-    background: #111;
-    color: #fff;
-    font-family: Arial, sans-serif;
-    text-align: center;
-}
+    body {
+        background: #0f1724;
+        color: #e6eef8;
+        font-family: Arial, sans-serif;
+        padding: 20px;
+    }
 
-.hidden { display: none; }
+    h1 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
 
-input, button, select {
-    padding: 10px;
-    margin: 6px;
-    border-radius: 6px;
-    border: none;
-    font-size: 16px;
-}
+    button {
+        width: 100%;
+        padding: 12px;
+        background: #f59e0b;
+        border: none;
+        border-radius: 10px;
+        color: #000;
+        font-size: 18px;
+        font-weight: bold;
+        margin-top: 10px;
+    }
 
-button.primary {
-    background: #ffbe00;
-    color: #000;
-    font-weight: bold;
-}
+    #inv {
+        margin-top: 20px;
+        padding: 10px;
+        background: #0b1220;
+        border-radius: 10px;
+        max-height: 250px;
+        overflow-y: auto;
+    }
 
-button.ghost {
-    background: #333;
-    color: #fff;
-}
+    .item {
+        padding: 8px;
+        border-bottom: 1px solid #223;
+    }
 
-#auth, #game {
-    padding: 20px;
-}
-
-#inventory, #shop {
-    margin-top: 20px;
-}
-
-.inv-item {
-    padding: 10px;
-    background: #222;
-    margin: 6px;
-    border-radius: 6px;
-    display: flex;
-    justify-content: space-between;
-}
-
-.rarity-Legend { color: #ff5050; }
-.rarity-Epic { color: #8f5bff; }
-.rarity-Rare { color: #4ea3ff; }
-.rarity-Uncommon { color: #7aff7a; }
-.rarity-Common { color: #ccc; }
-
-#reel {
-    display: flex;
-    overflow: hidden;
-    width: 100%;
-    margin-top: 25px;
-}
-
-.card {
-    width: 180px;
-    margin-right: 12px;
-    padding: 12px;
-    background: #222;
-    border-radius: 6px;
-}
+    small {
+        color: #98a6bf;
+    }
 </style>
-</head>
 
+</head>
 <body>
 
-<!-- Авторизация -->
-<div id="auth">
-    <h2>Вход / Регистрация</h2>
-    <input id="inUser" type="text" placeholder="Имя аккаунта"><br>
-    <input id="inPass" type="password" placeholder="Пароль"><br>
+<h1>Case Simulator</h1>
 
-    <button id="btnRegister" class="primary">Регистрация</button>
-    <button id="btnLogin" class="ghost">Войти</button>
+<div id="info"></div>
+
+<button onclick="openCase()">Открыть кейс (10 монет)</button>
+<button onclick="resetProgress()">Сбросить прогресс</button>
+
+<div id="inv">
+    <h2>Инвентарь:</h2>
+    <div id="invList"></div>
 </div>
 
-<!-- Игра -->
-<div id="game" class="hidden">
-    <h2>Аккаунт: <span id="userLabel"></span></h2>
-    <button id="btnProfile" class="ghost">Профиль</button>
+<script>
+/* === ХРАНЕНИЕ ПРОГРЕССА === */
+const SAVE_KEY = "case_simulator_save_v1";
 
-    <h3>Баланс: <span id="balance">0</span>₵</h3>
+function loadSave() {
+    try {
+        return JSON.parse(localStorage.getItem(SAVE_KEY)) || {
+            coins: 100,
+            inventory: [],
+            opened: 0
+        };
+    } catch {
+        return { coins: 100, inventory: [], opened: 0 };
+    }
+}
 
-    <h3>Открыть кейс</h3>
-    <select id="caseSelect"></select><br>
-    <button id="openCase" class="primary">Открыть</button>
+function saveProgress(data) {
+    localStorage.setItem(SAVE_KEY, JSON.stringify(data));
+}
 
-    <div id="reel"></div>
+/* === ОТОБРАЖЕНИЕ === */
+function render() {
+    let save = loadSave();
 
-    <h3>Инвентарь</h3>
-    <div id="inventory"></div>
+    document.getElementById("info").innerHTML = `
+        <h2>Монеты: ${save.coins}</h2>
+        <p>Открыто кейсов: ${save.opened}</p>
+    `;
 
-    <h3>Магазин кейсов</h3>
-    <div id="shop"></div>
-</div>
+    let invHtml = "";
+    save.inventory.slice().reverse().forEach(item => {
+        invHtml += `
+            <div class="item">
+                <strong>${item.name}</strong><br>
+                <small>${item.rarity} • ${new Date(item.time).toLocaleString()}</small>
+            </div>
+        `;
+    });
 
-<script src="main.js"></script>
+    document.getElementById("invList").innerHTML = invHtml || "<small>Пока пусто</small>";
+}
+
+render();
+
+/* === ЛОГИКА КЕЙСА === */
+function openCase() {
+    let save = loadSave();
+
+    if (save.coins < 10) {
+        alert("Недостаточно монет!");
+        return;
+    }
+
+    save.coins -= 10;
+
+    const items = [
+        { name: "Blue Gun", rarity: "common", chance: 70 },
+        { name: "Purple SMG", rarity: "rare", chance: 20 },
+        { name: "Pink Rifle", rarity: "epic", chance: 8 },
+        { name: "Golden Knife", rarity: "legendary", chance: 2 }
+    ];
+
+    const roll = Math.random() * 100;
+    let sum = 0;
+    let drop;
+
+    for (let it of items) {
+        sum += it.chance;
+        if (roll <= sum) {
+            drop = it;
+            break;
+        }
+    }
+
+    save.inventory.push({
+        name: drop.name,
+        rarity: drop.rarity,
+        time: Date.now()
+    });
+
+    save.opened++;
+
+    saveProgress(save);
+    render();
+
+    alert("Выпало: " + drop.name + " (" + drop.rarity + ")");
+}
+
+/* === СБРОС === */
+function resetProgress() {
+    if (!confirm("Точно сбросить прогресс?")) return;
+
+    localStorage.removeItem(SAVE_KEY);
+    render();
+}
+</script>
+
 </body>
 </html>
