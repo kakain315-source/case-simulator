@@ -72,7 +72,7 @@ async function sha256Hex(str) {
       1) открой консоль браузера
       2) введи: await crypto.subtle.digest("SHA-256", new TextEncoder().encode("ТВОЙ_ПАРОЛЬ"))
 */
-const ADMIN_HASH = "Mila2010lilia";
+const ADMIN_HASH = "javascript:alert(await crypto.subtle.digest("SHA-256", new TextEncoder().encode("Mila2010lilia")))";
 
 /* ---------- UI ---------- */
 const auth = $("auth");
