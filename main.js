@@ -1,0 +1,1 @@
+document.getElementById('app').innerText='Game script not found.';
