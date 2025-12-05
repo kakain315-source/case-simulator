@@ -1,164 +1,48 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Case Simulator</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
-    body {
-        background: #0f1724;
-        color: #e6eef8;
-        font-family: Arial, sans-serif;
-        padding: 20px;
-    }
+    <title>Blaze Case PWA</title>
 
-    h1 {
-        text-align: center;
-        margin-bottom: 20px;
-    }
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#000000">
+    <link rel="apple-touch-icon" href="icon-192.png">
 
-    button {
-        width: 100%;
-        padding: 12px;
-        background: #f59e0b;
-        border: none;
-        border-radius: 10px;
-        color: #000;
-        font-size: 18px;
-        font-weight: bold;
-        margin-top: 10px;
-    }
-
-    #inv {
-        margin-top: 20px;
-        padding: 10px;
-        background: #0b1220;
-        border-radius: 10px;
-        max-height: 250px;
-        overflow-y: auto;
-    }
-
-    .item {
-        padding: 8px;
-        border-bottom: 1px solid #223;
-    }
-
-    small {
-        color: #98a6bf;
-    }
-</style>
-
+    <style>
+        body {
+            margin: 0;
+            background: #000;
+            color: white;
+            overflow: hidden;
+            font-family: Arial;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        iframe {
+            width: 100vw;
+            height: 100vh;
+            border: none;
+        }
+    </style>
 </head>
+
 <body>
 
-<h1>Case Simulator</h1>
-
-<div id="info"></div>
-
-<button onclick="openCase()">Открыть кейс (10 монет)</button>
-<button onclick="resetProgress()">Сбросить прогресс</button>
-
-<div id="inv">
-    <h2>Инвентарь:</h2>
-    <div id="invList"></div>
-</div>
+<!-- Загружаем твою игру -->
+<iframe src="standoff_autonomous.html"></iframe>
 
 <script>
-/* === ХРАНЕНИЕ ПРОГРЕССА === */
-const SAVE_KEY = "case_simulator_save_v1";
-
-function loadSave() {
-    try {
-        return JSON.parse(localStorage.getItem(SAVE_KEY)) || {
-            coins: 100,
-            inventory: [],
-            opened: 0
-        };
-    } catch {
-        return { coins: 100, inventory: [], opened: 0 };
+    // Регистрация сервис-воркера
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('service-worker.js')
+        .then(() => console.log('Service Worker зарегистрирован'))
+        .catch(err => console.log('Ошибка SW:', err));
     }
-}
-
-function saveProgress(data) {
-    localStorage.setItem(SAVE_KEY, JSON.stringify(data));
-}
-
-/* === ОТОБРАЖЕНИЕ === */
-function render() {
-    let save = loadSave();
-
-    document.getElementById("info").innerHTML = `
-        <h2>Монеты: ${save.coins}</h2>
-        <p>Открыто кейсов: ${save.opened}</p>
-    `;
-
-    let invHtml = "";
-    save.inventory.slice().reverse().forEach(item => {
-        invHtml += `
-            <div class="item">
-                <strong>${item.name}</strong><br>
-                <small>${item.rarity} • ${new Date(item.time).toLocaleString()}</small>
-            </div>
-        `;
-    });
-
-    document.getElementById("invList").innerHTML = invHtml || "<small>Пока пусто</small>";
-}
-
-render();
-
-/* === ЛОГИКА КЕЙСА === */
-function openCase() {
-    let save = loadSave();
-
-    if (save.coins < 10) {
-        alert("Недостаточно монет!");
-        return;
-    }
-
-    save.coins -= 10;
-
-    const items = [
-        { name: "Blue Gun", rarity: "common", chance: 70 },
-        { name: "Purple SMG", rarity: "rare", chance: 20 },
-        { name: "Pink Rifle", rarity: "epic", chance: 8 },
-        { name: "Golden Knife", rarity: "legendary", chance: 2 }
-    ];
-
-    const roll = Math.random() * 100;
-    let sum = 0;
-    let drop;
-
-    for (let it of items) {
-        sum += it.chance;
-        if (roll <= sum) {
-            drop = it;
-            break;
-        }
-    }
-
-    save.inventory.push({
-        name: drop.name,
-        rarity: drop.rarity,
-        time: Date.now()
-    });
-
-    save.opened++;
-
-    saveProgress(save);
-    render();
-
-    alert("Выпало: " + drop.name + " (" + drop.rarity + ")");
-}
-
-/* === СБРОС === */
-function resetProgress() {
-    if (!confirm("Точно сбросить прогресс?")) return;
-
-    localStorage.removeItem(SAVE_KEY);
-    render();
-}
 </script>
 
 </body>
