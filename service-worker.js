@@ -1,47 +1,30 @@
-const CACHE_NAME = 'case-sim-cache-v4';
-
-const FILES_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/style.css',
-  '/main.js'
+const CACHE_NAME = 'case-sim-v1';
+const FILES = [
+  './',
+  './index.html',
+  './style.css',
+  './main.js',
+  './manifest.json'
 ];
 
-// Установка Service Worker
-self.addEventListener('install', evt => {
-  evt.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      return cache.addAll(FILES_TO_CACHE);
-    })
-  );
+self.addEventListener('install', evt=>{
+  evt.waitUntil(caches.open(CACHE_NAME).then(c=>c.addAll(FILES)));
   self.skipWaiting();
 });
-
-// Активация — очищаем старые кэши
-self.addEventListener('activate', evt => {
+self.addEventListener('activate', evt=>{
   evt.waitUntil(
-    caches.keys().then(keys => {
-      return Promise.all(
-        keys
-          .filter(key => key !== CACHE_NAME)
-          .map(key => caches.delete(key))
-      );
-    })
+    caches.keys().then(keys => Promise.all(
+      keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
+    ))
   );
   self.clients.claim();
 });
-
-// Перехват запросов
-self.addEventListener('fetch', evt => {
-  evt.respondWith(
-    fetch(evt.request)
-      .then(response => {
-        // Сохраняем новую версию файла
-        const clone = response.clone();
-        caches.open(CACHE_NAME).then(cache => cache.put(evt.request, clone));
-        return response;
-      })
-      .catch(() => caches.match(evt.request))
-  );
+self.addEventListener('fetch', evt=>{
+  const req = evt.request;
+  // try network first for fresh main.js and index.html
+  if(req.method === 'GET' && (req.url.endsWith('/main.js') || req.url.endsWith('/index.html'))){
+    evt.respondWith(fetch(req).catch(()=>caches.match(req)));
+    return;
+  }
+  evt.respondWith(caches.match(req).then(m => m || fetch(req).catch(()=>caches.match('./'))));
 });
