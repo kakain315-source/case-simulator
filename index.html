@@ -2,57 +2,145 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
+<title>Standoff 2 — Case Simulator</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Standoff Case Simulator</title>
-<link rel="stylesheet" href="style.css">
+
+<style>
+    body { background:#111; color:#fff; font-family:Arial; margin:0; padding:0; }
+    h2 { margin-top:0; }
+    .hidden { display:none; }
+
+    #auth, #game {
+        padding:20px;
+    }
+
+    input {
+        width:90%;
+        padding:10px;
+        margin:5px 0;
+        border:none;
+        border-radius:8px;
+        font-size:16px;
+    }
+
+    button {
+        padding:10px 20px;
+        background:#ffcc00;
+        color:#000;
+        border:none;
+        border-radius:8px;
+        font-size:16px;
+        font-weight:bold;
+        margin:5px 0;
+        cursor:pointer;
+    }
+
+    #shop .shopCard {
+        background:#222;
+        padding:10px;
+        border-radius:10px;
+        margin:8px 0;
+    }
+
+    .invItem {
+        background:#222;
+        padding:10px;
+        border-radius:10px;
+        margin:5px 0;
+    }
+
+    .rarity-Legend   { color:#ff00ea; }
+    .rarity-Epic     { color:#9400ff; }
+    .rarity-Rare     { color:#0094ff; }
+    .rarity-Uncommon { color:#00ff99; }
+    .rarity-Common   { color:#ccc; }
+
+    #reel {
+        width:100%;
+        display:flex;
+        overflow:hidden;
+        margin-top:20px;
+        height:140px;
+        align-items:center;
+        border:2px solid #444;
+        border-radius:10px;
+    }
+
+    #reel .card {
+        min-width:160px;
+        background:#222;
+        border-radius:12px;
+        padding:15px;
+        margin-right:12px;
+        text-align:center;
+    }
+
+    /* admin modal */
+    #adminModal {
+        position:fixed;
+        top:0; left:0; right:0; bottom:0;
+        background:rgba(0,0,0,0.7);
+        display:flex;
+        justify-content:center;
+        align-items:center;
+    }
+    #adminBox {
+        background:#222;
+        padding:20px;
+        border-radius:12px;
+        width:80%;
+        max-width:350px;
+        text-align:center;
+    }
+</style>
 </head>
 <body>
 
-<header>
-    <h1>Standoff Case Simulator</h1>
-    <span id="userLabel"></span>
-    <button id="btnProfile">Профиль</button>
-</header>
+<!-- ------------------- АВТОРИЗАЦИЯ ------------------- -->
 
-<!-- Авторизация -->
 <div id="auth">
     <h2>Вход / Регистрация</h2>
-    <input id="inUser" type="text" placeholder="Имя">
-    <input id="inPass" type="password" placeholder="Пароль">
+    <input id="inUser" placeholder="Имя">
+    <input id="inPass" placeholder="Пароль" type="password">
+
     <button id="btnLogin">Войти</button>
     <button id="btnRegister">Регистрация</button>
 </div>
 
-<!-- Игровой интерфейс -->
+<!-- ------------------- ИГРА ------------------- -->
+
 <div id="game" class="hidden">
 
-    <h2>Баланс: <span id="balance">0</span>₵</h2>
+    <h2>Профиль</h2>
+    Баланс: <span id="balance">0</span>₵ <br>
+    <button id="btnProfile">Выйти</button>
+    <button id="btnAdmin">Админ</button>
 
-    <h3>Магазин кейсов</h3>
+    <h2>Магазин</h2>
     <div id="shop"></div>
 
-    <h3>Открыть кейс</h3>
+    <h2>Открытие кейсов</h2>
     <select id="caseSelect"></select>
-    <button id="openCase">Открыть</button>
-
-    <div id="reel" class="reel"></div>
+    <button id="openCase">Открыть кейс</button>
+    <div id="reel"></div>
     <p id="resultText"></p>
 
-    <h3>Инвентарь</h3>
+    <h2>Инвентарь</h2>
     <div id="inventory"></div>
-
-    <button id="btnAdmin">Админ</button>
 </div>
 
-<!-- Админ-панель -->
-<div id="adminModal" class="modal hidden">
-    <div class="modal-content">
-        <h2>Вход в админку</h2>
-        <input id="adminPass" type="password" placeholder="Пароль">
+<!-- ------------------- АДМИН-МОДАЛ ------------------- -->
+
+<div id="adminModal" class="hidden">
+    <div id="adminBox">
+        <h3>Админ вход</h3>
+        <input id="adminPass" type="password" placeholder="Пароль администратора">
+        <button id="adminOk">OK</button>
         <button id="adminCancel">Отмена</button>
-        <button id="adminOk">Войти</button>
     </div>
 </div>
+
+<!-- ------------------- MAIN SCRIPT ------------------- -->
 
 <script src="main.js"></script>
 
