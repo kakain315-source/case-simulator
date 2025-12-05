@@ -214,26 +214,40 @@ function openCase(id) {
     resultText.textContent = `${item.name} (${item.rarity})`;
 }
 
-/* ========== ADMIN (HIDDEN PASSWORD) ============= */
+// --- ADMIN PANEL (новая версия, работает гарантированно) ---
 
-// Пароль зашифрован
-const ADMIN_HASH = "6a04da6e3bdc1cee92f3db3f7e2ba8c0"; // пример
+// ЗАШИФРОВАННЫЙ ПАРОЛЬ "333"
+const ADMIN_HASH = "202cb962ac59075b964b07152d234b70"; // MD5("333")
 
-function md5(s){ return CryptoJS.MD5(s).toString(); }
+function md5(s) {
+    return CryptoJS.MD5(s).toString();
+}
 
-adminOk.addEventListener('click', ()=>{
-  if(md5(adminPass.value) === ADMIN_HASH){
-      adminModal.classList.add('hidden');
-      const u = STORE.users[STORE.currentUser];
-      if(u){
-        u.coins = 999999999;
-        saveState(STORE);
-        refreshBalance();
-        alert('Админ: монеты выданы!');
-      }
-  } else {
-      alert('Неверный пароль');
-  }
+btnAdmin.addEventListener("click", () => {
+    adminModal.classList.remove("hidden");
+    adminPass.value = "";
+    adminPass.focus();
+});
+
+adminCancel.addEventListener("click", () => {
+    adminModal.classList.add("hidden");
+});
+
+adminOk.addEventListener("click", () => {
+    const entered = adminPass.value.trim();
+
+    if (md5(entered) === ADMIN_HASH) {
+        adminModal.classList.add("hidden");
+        const u = STORE.users[STORE.currentUser];
+        if (u) {
+            u.coins = 999999999;
+            saveState(STORE);
+            refreshBalance();
+            alert("Админ доступ подтверждён — монеты начислены");
+        }
+    } else {
+        alert("Неверный пароль");
+    }
 });
 
 // hash("Mila2010lilia")
