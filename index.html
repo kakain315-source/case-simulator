@@ -1,35 +1,60 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Standoff Case Simulator</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Standoff Case Simulator</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h1>Standoff Case Simulator</h1>
+<header>
+    <h1>Standoff Case Simulator</h1>
+    <span id="userLabel"></span>
+    <button id="btnProfile">Профиль</button>
+</header>
 
-<button onclick="openAdmin()">Профиль</button>
-
-<div id="authWindow" class="window">
+<!-- Авторизация -->
+<div id="auth">
     <h2>Вход / Регистрация</h2>
-    <input id="username" placeholder="Имя...">
-    <input id="password" type="password" placeholder="Пароль...">
-    <button onclick="login()">Войти</button>
-    <button onclick="register()">Регистрация</button>
+    <input id="inUser" type="text" placeholder="Имя">
+    <input id="inPass" type="password" placeholder="Пароль">
+    <button id="btnLogin">Войти</button>
+    <button id="btnRegister">Регистрация</button>
 </div>
 
-<p>Офлайн: доступно. Для онлайн-multiplayer требуется включить удалённое хранилище сервера.</p>
+<!-- Игровой интерфейс -->
+<div id="game" class="hidden">
 
-<!-- Окно входа в админку -->
-<div id="adminWindow" class="window hidden">
-    <h2>Вход в админку</h2>
-    <input id="adminPass" type="password" placeholder="Пароль">
-    <button onclick="closeAdmin()">Отмена</button>
-    <button onclick="enterAdmin()">Войти</button>
+    <h2>Баланс: <span id="balance">0</span>₵</h2>
+
+    <h3>Магазин кейсов</h3>
+    <div id="shop"></div>
+
+    <h3>Открыть кейс</h3>
+    <select id="caseSelect"></select>
+    <button id="openCase">Открыть</button>
+
+    <div id="reel" class="reel"></div>
+    <p id="resultText"></p>
+
+    <h3>Инвентарь</h3>
+    <div id="inventory"></div>
+
+    <button id="btnAdmin">Админ</button>
+</div>
+
+<!-- Админ-панель -->
+<div id="adminModal" class="modal hidden">
+    <div class="modal-content">
+        <h2>Вход в админку</h2>
+        <input id="adminPass" type="password" placeholder="Пароль">
+        <button id="adminCancel">Отмена</button>
+        <button id="adminOk">Войти</button>
+    </div>
 </div>
 
 <script src="main.js"></script>
+
 </body>
 </html>
